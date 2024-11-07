@@ -1,14 +1,7 @@
 #include <stdio.h>
 #include "postgres.h"
-#include "fmgr.h"
-#include "lib/stringinfo.h"
-#include "mb/pg_wchar.h"
 #include "utils/builtins.h"
-#include "utils/numeric.h"
-#include "utils/pg_locale.h"
-#include "utils/formatting.h"
 #include "utils/wait_event.h"
-#include "varatt.h"
 
 PG_MODULE_MAGIC;
 PG_FUNCTION_INFO_V1(waitevent_by_number);

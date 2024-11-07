@@ -1,0 +1,38 @@
+
+uprobe:/usr/lib/postgresql/16/bin/postgres:standard_ExecutorStart /pid==$2/
+{
+ printf("%s\n",str(uptr(*(arg0+16))));
+ @executor_start=nsecs;
+}
+
+uretprobe:/usr/lib/postgresql/16/bin/postgres:standard_ExecutorEnd /pid==$2/
+{
+ printf("Execution time: %d ns\n",nsecs-@executor_start);
+ delete(@executor_start);
+}
+
+watchpoint:$1:8:rw
+{
+ if (*uptr($1)!=0) {
+   @wait_event=*uptr($1);
+   @wait_start=nsecs;
+  }
+ else if(@wait_event!=0){
+  printf("#WAIT %d %ld ns %s\n",@wait_event,nsecs-@wait_start,ustack(7));
+  delete(@wait_event);
+  delete(@wait_start);
+ }
+}
+
+BEGIN{
+ @script_start=nsecs;
+}
+
+END{
+ printf("Script run time: %ld ms\n",(nsecs-@script_start)/1e6);
+ clear(@script_start);
+ clear(@executor_start);
+ clear(@wait_event);
+ clear(@wait_start);
+ printf("Exiting\n");
+}

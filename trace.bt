@@ -1,10 +1,10 @@
-uprobe:/usr/lib/postgresql/16/bin/postgres:standard_ExecutorStart /pid==$2/
+uprobe:$3:standard_ExecutorStart /pid==$2/
 {
  printf("%s\n",str(uptr(*(arg0+16))));
  @executor_start=nsecs;
 }
 
-uretprobe:/usr/lib/postgresql/16/bin/postgres:standard_ExecutorEnd /pid==$2/
+uretprobe:$3:standard_ExecutorEnd /pid==$2/
 {
  if(@executor_start!=0){
   printf("Execution time: %d ns\n",nsecs-@executor_start);
@@ -30,7 +30,7 @@ BEGIN{
 }
 
 END{
- printf("Script run time: %ld ms\n",(nsecs-@script_start)/1e6); 
+ printf("Script run time: %ld ms\n",(nsecs-@script_start)/1e6);
  clear(@script_start);
  clear(@executor_start);
  clear(@wait_event);

@@ -1,3 +1,4 @@
+set print repeats 0
 set $s=NewExplainState()
 call ExplainBeginOutput($s)
 call ExplainPrintPlan($s,$a)

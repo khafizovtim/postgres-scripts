@@ -53,6 +53,36 @@ uretprobe:'$POSTGRES_BINARY':CommitTransactionCommand
 }
 
 
+uprobe:'$POSTGRES_BINARY':PreCommit_on_commit_actions
+{
+ @precommit_time[pid]=nsecs;
+ printf("%d %s : entered PreCommit_on_commit_actions\n",pid, strftime("%H:%M:%S:%f",nsecs));
+}
+
+uretprobe:'$POSTGRES_BINARY':PreCommit_on_commit_actions
+{
+ if(@precommit_time[pid]!=0){
+     printf("%d %s : PreCommit_on_commit_actions time %lu ns\n",pid, strftime("%H:%M:%S:%f",nsecs),nsecs-@precommit_time[pid]);
+     delete(@precommit_time[pid]);
+ }
+}
+
+
+uprobe:'$POSTGRES_BINARY':LogLogicalInvalidations
+{
+  printf("%d %s : entered LogLogicalInvalidations\n",pid, strftime("%H:%M:%S:%f",nsecs));
+}
+
+uprobe:'$POSTGRES_BINARY':smgrGetPendingDeletes
+{
+ printf("%d %s : entered smgrGetPendingDeletes\n",pid, strftime("%H:%M:%S:%f",nsecs));
+}
+
+uprobe:'$POSTGRES_BINARY':XactLogCommitRecord
+{
+ printf("%d %s : entered XactLogCommitRecord\n",pid, strftime("%H:%M:%S:%f",nsecs));
+}
+
 
 uprobe:'$POSTGRES_BINARY':0x'$SYNCREPWAITFORLSN_ADDR'
 {
@@ -82,7 +112,7 @@ uprobe:'$POSTGRES_BINARY':XLogFlush
 uretprobe:'$POSTGRES_BINARY':XLogFlush
 {
   if(@xlogflushwait[pid]!=0){
-  printf("%d XLogFlush ended in %lu ns\n",pid, nsecs-@xlogflushwait[pid]);
+  printf("%d %s : XLogFlush ended in %lu ns\n",pid, strftime("%H:%M:%S:%f",nsecs), nsecs-@xlogflushwait[pid]);
   delete(@xlogflushwait[pid]);
  }
 }
@@ -95,7 +125,7 @@ uprobe:'$POSTGRES_BINARY':XLogWrite
 uretprobe:'$POSTGRES_BINARY':XLogWrite
 {
   if(@xlogwritewait[pid]!=0){
-  printf("%d XLogWrite ended in %lu ns\n",pid, nsecs-@xlogwritewait[pid]);
+  printf("%d %s : XLogWrite ended in %lu ns\n",pid, strftime("%H:%M:%S:%f",nsecs), nsecs-@xlogwritewait[pid]);
   delete(@xlogwritewait[pid]);
  }
 }
@@ -121,4 +151,5 @@ END
  clear(@xlogwritewait);
  clear(@xlogbackgroundflush);
  clear(@syncrepwait);
+ clear(@precommit_time);
 }' -o $trace_file_name  2>/dev/null

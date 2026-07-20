@@ -4,7 +4,7 @@ echo "Longest commits"
 trace_file=$1
 grep "commit time" $trace_file | sort -n -k6 |tail -20
 echo
-ckpt_wri_pids=\"$(echo ^$(pgrep -f "[c]heckpointer|[b]ackground writer" -d"|^"))\"
+ckpt_wri_pids=$(echo ^$(pgrep -f "[c]heckpointer|[b]ackground writer" -d"|^"))
 #echo $ckpt_wri_pids
 xlf_count=0
 xlf_count_1ms=0

@@ -9,7 +9,7 @@ uprobe:$3:standard_ProcessUtility /pid==$2/
 }
 
 
-watchpoint:$1:8:rw
+watchpoint:$1:4:rw
 {
  if (*uptr($1)!=0) {
    @wait_event=*uptr($1);

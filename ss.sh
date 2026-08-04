@@ -1,6 +1,6 @@
 walfile="$PGDATA/pg_wal/"$(psql -tAc "SELECT pg_walfile_name(pg_current_wal_lsn() - 16777216)")
 pg_waldump $walfile > /tmp/wal
- awk '{print int(substr($8,1,length($8)-1)) " " int(substr($6,1,length($6)-1))}' /tmp/wal | sort -n | awk '{if ($1>0) transact_size[$1] += $2} END {for (xid in transact_size) print xid, transact_size[xid]}' > /tmp/tr.size
+ awk '{print int(substr($8,1,length($8)-1)) " " int(substr($6,1,length($6)-1))}' /tmp/wal | sort -n | awk '{if ($1>0) transact_size[$1] += $2} END {for (xid in transact_size) print xid, transact_size[xid]}' > /tmp/tr.size
 total=$(wc -l /tmp/tr.size | cut -d' ' -f1)
 less_128=$(awk '$2<128' /tmp/tr.size | wc -l)
 more_128_less_256=$(awk '$2>=128 && $2<256' /tmp/tr.size | wc -l)

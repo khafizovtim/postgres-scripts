@@ -14,7 +14,7 @@ SYNCREPWAITFORLSN_ADDR=$(nm $POSTGRES_BINARY_DEBUG | grep SyncRepWaitForLSN.part
 echo $POSTGRES_BINARY
 echo $SYNCREPWAITFORLSN_ADDR
 #export BPFTRACE_STRLEN=200
-
+export BPFTRACE_PERF_RB_PAGES=1024
 trace_file_name=trace.commits.$(date +%Y%m%d%H%M%S)
 
 timeout "${DURATION}s"  bpftrace -e'
